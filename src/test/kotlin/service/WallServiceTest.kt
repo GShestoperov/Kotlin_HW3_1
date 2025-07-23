@@ -188,4 +188,100 @@ class WallServiceTest {
         )
 
     }
+
+
+    @Test
+    fun reportComment_OK() {
+        WallService.addPost(
+            Post(
+                id = 0,
+                ownerId = 2,
+                fromId = 2,
+                date = 150
+            )
+        )
+
+        val comment = WallService.createComment(
+            1, Comment(
+                1, 1,
+                fromId = 2,
+                date = 260,
+                text = "Это мой первый комментарий"
+            )
+        )
+
+        val result = WallService.reportComment(2, 1, 1)
+
+        assertEquals(ReportComment(2, 1, 1), result)
+    }
+
+    @Test(expected = CommentNotFoundException::class)
+    fun reportComment_CommentNotFoundException() {
+        WallService.addPost(
+            Post(
+                id = 0,
+                ownerId = 2,
+                fromId = 2,
+                date = 150
+            )
+        )
+
+        val comment = WallService.createComment(
+            1, Comment(
+                1, 1,
+                fromId = 2,
+                date = 260,
+                text = "Это мой первый комментарий"
+            )
+        )
+
+        val result = WallService.reportComment(2, 2, 1)
+    }
+
+    @Test(expected = CommentOwnerMismatchException::class)
+    fun reportComment_CommentOwnerMismatchException() {
+        WallService.addPost(
+            Post(
+                id = 0,
+                ownerId = 2,
+                fromId = 2,
+                date = 150
+            )
+        )
+
+        val comment = WallService.createComment(
+            1, Comment(
+                1, 1,
+                fromId = 2,
+                date = 260,
+                text = "Это мой первый комментарий"
+            )
+        )
+
+        val result = WallService.reportComment(1, 1, 1)
+    }
+
+    @Test(expected = IncorrectReportReasonException::class)
+    fun reportComment_IncorrectReportReasonException() {
+        WallService.addPost(
+            Post(
+                id = 0,
+                ownerId = 2,
+                fromId = 2,
+                date = 150
+            )
+        )
+
+        val comment = WallService.createComment(
+            1, Comment(
+                1, 1,
+                fromId = 2,
+                date = 260,
+                text = "Это мой первый комментарий"
+            )
+        )
+
+        val result = WallService.reportComment(2, 1, 9d)
+    }
+
 }

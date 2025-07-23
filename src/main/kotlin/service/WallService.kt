@@ -1,15 +1,20 @@
 package service
 
 import data.Comment
+import data.CommentNotFoundException
+import data.CommentOwnerMismatchException
 import data.Comments
+import data.IncorrectReportReasonException
 import data.Post
 import data.PostNotFoundException
+import data.ReportComment
 
 object WallService {
     private var postArr: Array<Post> = arrayOf<Post>()
     private var nextPostId: Long = 1
     private var comments = emptyArray<Comment>()
     private var nextCommentId: Long = 1
+    private var reportComments = emptyArray<ReportComment>()
 
     fun clearWall() {
         postArr = emptyArray<Post>()
@@ -80,6 +85,33 @@ object WallService {
         return comments.last()
     }
 
+    fun reportComment(ownerId: Long, commentId: Long, reason: Int): ReportComment {
+        var foundIndex = -1
+
+        for ((index, item) in comments.withIndex()) {
+            if (item.id == commentId) {
+                foundIndex = index
+                break
+            }
+        }
+
+        if (foundIndex == -1) {
+            throw CommentNotFoundException("Comment with id " + commentId + " not found")
+        }
+
+        if (comments[foundIndex].fromId != ownerId) {
+            throw CommentOwnerMismatchException("Comment ownerId " + comments[foundIndex].fromId + " mismatch the parametr " + ownerId)
+        }
+
+        if (!(reason in 0..8)) {
+            throw IncorrectReportReasonException("Incorrect report comment reason")
+        }
+
+        reportComments += ReportComment(ownerId, commentId, reason)
+
+        return reportComments.last()
+    }
+
     override fun toString(): String {
         var strBuilder: StringBuilder = StringBuilder("Посты на стене: \n")
 
@@ -94,7 +126,11 @@ object WallService {
                     strBuilder.append("\n")
                 }
             }
+        }
 
+        strBuilder.append("\nЖалобы на комментарии: \n")
+        for (item in reportComments) {
+            strBuilder.append(item)
             strBuilder.append("\n")
         }
 

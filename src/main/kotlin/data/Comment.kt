@@ -10,3 +10,7 @@ data class Comment(
     val replyToComment: Long? = null
 ) {
 }
+
+class CommentNotFoundException(message: String) : RuntimeException(message)
+
+class CommentOwnerMismatchException(message: String) : RuntimeException(message)

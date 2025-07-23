@@ -40,6 +40,7 @@ fun main() {
         )
     )
 
+    WallService.reportComment(1, 2, 1)
 
     println(WallService)
 }
